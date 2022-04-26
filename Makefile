@@ -14,6 +14,8 @@ all: print_header
 	cp ./srcs/.env ./srcs/requirements/mariadb/conf/.env
 	cp ./srcs/.env ./srcs/requirements/wordpress/conf/.env
 	docker-compose -f ./srcs/docker-compose.yml up -d
+	rm -f ./srcs/requirements/mariadb/conf/.env
+	rm -f ./srcs/requirements/wordpress/conf/.env
 .PHONY: all
 
 print_header:
@@ -36,7 +38,7 @@ clean:
 	docker rmi -f srcs_nginx_inception
 .PHONY: clean
 
-log:
+logs:
 	docker-compose -f ./srcs/docker-compose.yml logs
 .PHONY: log
 
