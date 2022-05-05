@@ -1,11 +1,10 @@
-FROM alpine:3.14
+FROM debian:buster
 
-RUN		apk update		\
-	&&	apk upgrade		\
-	&&	apk add --no-cache php-fpm php-mysqlnd wget php php-phar php-json
+RUN		apt-get update -y	\
+	&&	apt-get upgrade -y	\
+	&&	apt-get install -y php-fpm php-mysqlnd wget
 
-WORKDIR	/var/www/wordpress
-
+WORKDIR	/
 
 COPY	conf/ .
 

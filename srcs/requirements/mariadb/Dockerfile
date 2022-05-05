@@ -1,32 +1,27 @@
-FROM alpine:3.14
+FROM debian:buster
 
-RUN		apk update		\
-	&&	apk upgrade
+RUN		apt-get update -y	\
+	&&	apt-get upgrade -y	\
+	&&	apt-get install -y mariadb-server
 
 WORKDIR	/tmp/mariadb/
 
 COPY 	conf/ .
 
-RUN		set -a			\
-	&&	source .env		\
-	&&	sh ./setdata.sh
+RUN		sh ./setdata.sh		\
+	&&	cat setup.sql
 
 RUN		chmod 755 ./setup.sql	\
 	&&	rm ./setdata.sh
 
-RUN		apk add --no-cache mariadb mariadb-client
-
 RUN		mkdir -p /etc/mysql/mariadb.conf.d
-RUN		cp 50-server.cnf /etc/mysql/mariadb.conf.d/
+RUN		cp ./50-server.cnf /etc/mysql/mariadb.conf.d
 
 RUN		mkdir -p /run/mysqld && mkdir -p /var/lib/mysql
 RUN 	cp ./setup.sql /var/lib/mysql
-RUN		cat /var/lib/mysql/setup.sql
-RUN		chown -R mysql:mysql /run/mysqld && chown mysql:mysql /var/lib/mysql
-RUN		mariadb-install-db --user=mysql --datadir='/var/lib/mysql'
 
-USER	mysql
+RUN		service mysql start && mysql << /var/lib/mysql/setup.sql
 
 EXPOSE	3306
 
-CMD		["mariadbd"]
+CMD		mysqld_safe
