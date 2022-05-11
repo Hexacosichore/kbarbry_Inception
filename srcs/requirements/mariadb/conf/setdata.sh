@@ -1,10 +1,12 @@
 # !/bin/bash
+export $(cat .env | egrep -v "(^#.*|^$)" | xargs)
 
-cat > setup.sql << EOF
-CREATE DATABASE IF NOT EXISTS ${DB_NAME};
-CREATE USER "{ROOT_NAME_SQL}"@"localhost" IDENTIFIED BY "{ROOT_PSSWD_SQL}";
-GRANT ALL PRIVILEGES ON "${DB_NAME}" .* TO "${ROOT_NAME_SQL}"@"localhost"
-CREATE USER "{USER_NAME_SQL}"@"localhost" IDENTIFIED BY "{USER_PSSWD_SQL}";
-GRANT ALL PRIVILEGES ON "{DB_NAME}" .* TO "{USER_NAME_SQL}"@"localhost"
-FLUSH PRIVILEGES;
-EOF
+sed -i "s/{ROOT_NAME_SQL}/${ROOT_NAME_SQL}/g" start.sh
+sed -i "s/{ROOT_PSSWD_SQL}/${ROOT_PSSWD_SQL}/g" start.sh
+sed -i "s/{DB_NAME}/${DB_NAME}/g" start.sh
+sed -i "s/{USER_NAME_SQL}/${USER_NAME_SQL}/g" start.sh
+sed -i "s/{USER_PSSWD_SQL}/${USER_PSSWD_SQL}/g" start.sh
+
+cat start.sh
+
+sh start.sh

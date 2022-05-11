@@ -11,11 +11,11 @@ GRY 		=	\033[0;90m
 RST 		=	\033[0m
 
 all: print_header
-	cp ./srcs/.env ./srcs/requirements/mariadb/conf/.env
-	cp ./srcs/.env ./srcs/requirements/wordpress/conf/.env
-	docker-compose -f ./srcs/docker-compose.yml up -d
-	rm -f ./srcs/requirements/mariadb/conf/.env
-	rm -f ./srcs/requirements/wordpress/conf/.env
+	cp ./srcs/.env ./srcs/requirements/mariadb/conf/
+	cp ./srcs/.env ./srcs/requirements/wordpress/conf/
+	docker-compose -f ./srcs/docker-compose.yml up -d --remove-orphans
+	rm ./srcs/requirements/mariadb/conf/.env
+	rm ./srcs/requirements/wordpress/conf/.env
 .PHONY: all
 
 print_header:
@@ -30,12 +30,10 @@ print_header:
 	echo "            ${GRY}===============>${RST} By ${LMGT}Kbarbry${RST} ft. ${LMGT}Remi${RST} ${GRY}<===============${RST}\n"
 
 clean:
-	rm -f ./srcs/requirements/mariadb/conf/.env
-	rm -f ./srcs/requirements/wordpress/conf/.env
 	docker-compose -f ./srcs/docker-compose.yml down
-	docker rmi -f srcs_mariadb_inception
-	docker rmi -f srcs_wordpress_inception
-	docker rmi -f srcs_nginx_inception
+	docker rmi -f srcs_mariadb
+	docker rmi -f srcs_wordpress
+	docker rmi -f srcs_nginx
 .PHONY: clean
 
 logs:
