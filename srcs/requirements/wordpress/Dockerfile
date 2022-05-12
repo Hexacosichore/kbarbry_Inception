@@ -2,24 +2,28 @@ FROM debian:buster
 
 RUN		apt-get update -y	\
 	&&	apt-get upgrade -y	\
-	&&	apt-get install -y wget php-fpm php-mysqlnd tar
+	&&	apt-get install -y php-fpm php-mysql tar
 
-COPY	conf/ .
+COPY 	./conf/ .
+COPY 	./tools/ .
 
-RUN		mkdir -p /var/www/wordpress
+ADD		https://wordpress.org/latest.tar.gz ./latest.tar.gz
+RUN		mkdir -p /var/www					\
+	&&	tar -xzvf latest.tar.gz				\
+	&&	rm latest.tar.gz					\
+	&&	mv -f ./wordpress /var/www/			\
+	&&	mkdir -p /run/php/					\
+	&&	chmod 755 -R /var/www/wordpress		\
+	&&	chown -R www-data:www-data /var/www/wordpress
 
-RUN		wget https://wordpress.org/latest.tar.gz
-RUN		tar xzvf latest.tar.gz
-RUN		rm latest.tar.gz
-RUN		mv -f wordpress /var/www/
+RUN 	rm -f /var/www/wordpress/wp-config-sample.php	\
+	&&	mv ./wp-config.php /var/www/wordpress/			\
+	&&	mv ./www.conf /etc/php/7.3/fpm/pool.d/www.conf	\
+	&&	chmod +x ./setdata.sh
 
-RUN		chown -R www-data:www-data /var/www/wordpress/
+RUN 	sed -i "/listen =/d" /etc/php/7.3/fpm/pool.d/www.conf		\
+	&&	echo "listen = 9000" >> /etc/php/7.3/fpm/pool.d/www.conf
 
-RUN		rm -rf /var/www/wordpress/wp-config-sample.php	\
-	&&	sh ./setdata.sh									\
-	&&	cat wp-config.php								\
-	&&	rm setdata.sh
+EXPOSE	9000
 
-EXPOSE 9000
-
-ENTRYPOINT sh ./start.sh
+ENTRYPOINT php-fpm7.3 -F -R

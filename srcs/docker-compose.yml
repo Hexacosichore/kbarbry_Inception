@@ -45,6 +45,7 @@ volumes:
             o: bind
             type: none
             device: "/home/kbarbry/data/mariadb"
+
     wordpress_volume:
         driver: local
         driver_opts:
