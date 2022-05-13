@@ -14,7 +14,7 @@ RUN		chmod +x ./setdata.sh	\
 
 RUN		sh ./setdata.sh			\
 	&&	sh ./start.sh			\
-	&&	cat setup.sql
+	&&	rm -f .env
 
 RUN		service mysql start	\
 	&&	mysql < setup.sql
